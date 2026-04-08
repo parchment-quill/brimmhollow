@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Brimm Hollow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    /* ─────────────────────────────────────────
+       RESET & VARIABLES
+    ───────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg:          #0c1a12;
+      --surface:     #152219;
+      --surface-2:   #1c2e22;
+      --border:      #243028;
+
+      --amber:       #E8A040;
+      --amber-soft:  rgba(232,160,64,0.12);
+      --fox:         #C47A52;
+      --fox-soft:    rgba(196,122,82,0.12);
+      --owl:         #5C8FA8;
+      --owl-light:   #8db4cc;
+      --owl-soft:    rgba(92,143,168,0.12);
+      --green:       #72ab6e;
+      --green-soft:  rgba(114,171,110,0.12);
+
+      --cream:       #F0E8D5;
+      --muted:       #8A9E8F;
+      --muted-dim:   #4e6455;
+
+      --nav-h:       68px;
+      --header-h:    54px;
+      --safe-top:    env(safe-area-inset-top, 0px);
+      --safe-bot:    env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left, 0px);
+      --safe-right:  env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─────────────────────────────────────────
+       STARS
+    ───────────────────────────────────────── */
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    /* ─────────────────────────────────────────
+       TOP BAR
+    ───────────────────────────────────────── */
+    #top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: calc(var(--header-h) + var(--safe-top));
+      padding-top: var(--safe-top);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: linear-gradient(to bottom,
+        rgba(12,26,18,0.96) 0%,
+        rgba(12,26,18,0.0) 100%);
+    }
+
+    #top-bar.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #home-btn {
+      background: none;
+      border: none;
+      color: var(--cream);
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      padding: 10px 20px;
+      opacity: 0.88;
+      transition: opacity 0.2s;
+    }
+    #home-btn:active { opacity: 0.5; }
+
+    /* ─────────────────────────────────────────
+       SCREEN CONTAINER
+    ───────────────────────────────────────── */
+    #screens {
+      position: fixed;
+      inset: 0;
+      padding-bottom: calc(var(--nav-h) + var(--safe-bot));
+      z-index: 1;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding-top: calc(var(--header-h) + var(--safe-top));
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #screen-home {
+      padding-top: 0; /* home has no top bar */
+    }
+
+    /* ─────────────────────────────────────────
+       BOTTOM NAV
+    ───────────────────────────────────────── */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: calc(var(--nav-h) + var(--safe-bot));
+      padding-bottom: var(--safe-bot);
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+      background: rgba(10, 18, 13, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 200;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 8px 6px;
+      min-width: 52px;
+      color: var(--muted-dim);
+      transition: color 0.2s, transform 0.15s;
+    }
+
+    .nav-btn.active { color: var(--amber); }
+    .nav-btn:active { transform: scale(0.88); }
+
+    .nav-icon { width: 26px; height: 26px; }
+
+    .nav-label {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ─────────────────────────────────────────
+       SHARED COMPONENTS
+    ───────────────────────────────────────── */
+    .screen-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .screen-eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 500;
+    }
+
+    .screen-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.1;
+    }
+
+    .screen-intro {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 290px;
+      font-weight: 300;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--cream);
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 11px;
+      color: var(--muted-dim);
+      margin-top: 12px;
+    }
+
+    .section-heading {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted-dim);
+      font-weight: 500;
+    }
+
+    /* ─────────────────────────────────────────
+       HOME SCREEN
+    ───────────────────────────────────────── */
+    #screen-home {
+      background: var(--bg);
+    }
+
+    .home-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: calc(var(--safe-top) + 48px) 22px 48px;
+      gap: 36px;
+      min-height: 100%;
+    }
+
+    .home-wordmark {
+      text-align: center;
+    }
+
+    .home-eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .home-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .home-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 300;
+      margin-top: 12px;
+      max-width: 260px;
+      line-height: 1.55;
+    }
+
+    /* Characters */
+    .characters {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .char-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 148px;
+      cursor: pointer;
+      padding: 18px 10px 16px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: transform 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .char-card:active { transform: scale(0.95); background: var(--surface-2); }
+
+    .char-glow {
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    .char-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .char-role {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* Destination grid */
+    .dest-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dest-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .dest-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 14px;
+      cursor: pointer;
+      transition: transform 0.18s, background 0.18s;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dest-card:active { transform: scale(0.96); background: var(--surface-2); }
+    .dest-card.span-2 { grid-column: 1 / -1; }
+
+    .dest-glow {
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    .dest-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--cream);
+      position: relative;
+    }
+
+    .dest-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      position: relative;
+    }
+
+    /* ─────────────────────────────────────────
+       PHOENIX SCREEN
+    ───────────────────────────────────────── */
+    #screen-phoenix {
+      background: linear-gradient(170deg, #091626 0%, #0c1a12 55%, #0c1a12 100%);
+    }
+
+    .phoenix-inner {
+      padding: 24px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1.00); filter: drop-shadow(0 0 8px rgba(92,143,168,0.25)); }
+      50%       { transform: scale(1.07); filter: drop-shadow(0 0 18px rgba(92,143,168,0.5)); }
+    }
+    .breathing { animation: breathe 4.5s ease-in-out infinite; }
+
+    .cards-col { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ─────────────────────────────────────────
+       QUERY SCREEN
+    ───────────────────────────────────────── */
+    #screen-query {
+      background: linear-gradient(170deg, #1c0d06 0%, #0c1a12 45%, #0c1a12 100%);
+    }
+
+    .query-inner {
+      padding: 24px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    #situation-input {
+      width: 100%;
+      min-height: 96px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #situation-input:focus { border-color: var(--fox); }
+    #situation-input::placeholder { color: var(--muted-dim); }
+
+    .rel-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .rel-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .rel-pill.on {
+      background: var(--fox-soft);
+      border-color: var(--fox);
+      color: var(--fox);
+    }
+
+    #ask-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--amber);
+      color: #1a0d04;
+      border: none;
+      border-radius: 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    #ask-btn:active { transform: scale(0.97); opacity: 0.85; }
+    #ask-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    #query-response {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #query-response.show { display: flex; }
+
+    .response-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .response-who {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .response-speaker {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: var(--fox);
+      font-weight: 600;
+    }
+
+    .response-text {
+      font-size: 15px;
+      line-height: 1.68;
+      color: var(--cream);
+    }
+
+    .response-text p { margin-bottom: 12px; }
+    .response-text p:last-child { margin-bottom: 0; }
+
+    .err-msg { font-size: 13px; color: #e07878; line-height: 1.5; }
+
+    .reset-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: var(--muted-dim);
+      cursor: pointer;
+      align-self: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .reset-btn:hover { color: var(--muted); border-color: var(--muted-dim); }
+
+    @keyframes dot-bounce {
+      0%, 100% { opacity: 0.25; transform: translateY(0); }
+      50%       { opacity: 1;    transform: translateY(-4px); }
+    }
+    .thinking { display: flex; gap: 7px; align-items: center; padding: 4px 0; }
+    .thinking span {
+      width: 7px; height: 7px;
+      background: var(--fox);
+      border-radius: 50%;
+      animation: dot-bounce 1.3s ease-in-out infinite;
+    }
+    .thinking span:nth-child(2) { animation-delay: 0.18s; }
+    .thinking span:nth-child(3) { animation-delay: 0.36s; }
+
+    /* ─────────────────────────────────────────
+       THE DEN
+    ───────────────────────────────────────── */
+    #screen-den {
+      background: linear-gradient(170deg, #091626 0%, #0c1a12 50%, #140906 100%);
+    }
+
+    .den-inner {
+      padding: 24px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .den-duo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .den-bridge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .den-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+    }
+
+    .den-line {
+      width: 1.5px;
+      height: 30px;
+    }
+
+    /* ─────────────────────────────────────────
+       THE CLEARING
+    ───────────────────────────────────────── */
+    #screen-clearing {
+      background: linear-gradient(170deg, #0c1a0a 0%, #0c1a12 100%);
+    }
+
+    .clearing-inner {
+      padding: 24px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .tab-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .tab-strip::-webkit-scrollbar { display: none; }
+
+    .tab {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.18s;
+    }
+    .tab.active {
+      background: var(--green-soft);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .soon-box {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted-dim);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .soon-glyph {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: var(--muted-dim);
+      opacity: 0.3;
+      margin-bottom: 10px;
+      display: block;
+      letter-spacing: 0.3em;
+    }
+
+    /* ─────────────────────────────────────────
+       THE BURROW
+    ───────────────────────────────────────── */
+    #screen-burrow {
+      background: linear-gradient(170deg, #1a0f04 0%, #0c1a12 50%, #0c1a12 100%);
+    }
+
+    .burrow-inner {
+      padding: 24px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .chat-mock {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-meta {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted-dim);
+      text-align: center;
+      padding: 4px 0 6px;
+    }
+
+    .bubble {
+      max-width: 84%;
+      padding: 11px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--cream);
+    }
+
+    .bubble.kid {
+      align-self: flex-end;
+      background: var(--amber-soft);
+      border: 1px solid rgba(232,160,64,0.18);
+      border-bottom-right-radius: 5px;
+    }
+
+    .bubble.care {
+      align-self: flex-start;
+      background: var(--owl-soft);
+      border: 1px solid rgba(92,143,168,0.18);
+      border-bottom-left-radius: 5px;
+    }
+
+    .chat-caption {
+      font-size: 11px;
+      color: var(--muted-dim);
+      text-align: center;
+      font-style: italic;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Stars canvas -->
+<canvas id="stars"></canvas>
+
+<!-- Top bar (hidden on home) -->
+<div id="top-bar">
+  <button id="home-btn">Brimm Hollow</button>
+</div>
+
+<!-- Screens -->
+<div id="screens">
+
+  <!-- ══════════════════════════════════
+       HOME
+  ══════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="home-inner">
+
+      <div class="home-wordmark">
+        <div class="home-eyebrow">Your inner world · your outer life</div>
+        <h1 class="home-title">Brimm Hollow</h1>
+        <p class="home-tagline">A place to figure things out, feel less alone, and be all of you.</p>
+      </div>
+
+      <!-- Characters -->
+      <div class="characters">
+
+        <div class="char-card" onclick="nav('phoenix')">
+          <div class="char-glow" style="background:var(--owl-light)"></div>
+          <!-- PHOENIX OWL -->
+          <svg width="88" height="88" viewBox="0 0 100 100" fill="none">
+            <!-- Wings -->
+            <path d="M28 64 C14 54 13 74 25 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M72 64 C86 54 87 74 75 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Body -->
+            <ellipse cx="50" cy="70" rx="21" ry="16" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+            <!-- Belly stripes -->
+            <line x1="42" y1="64" x2="58" y2="64" stroke="#5C8FA8" stroke-width="1" opacity="0.25"/>
+            <line x1="40" y1="69" x2="60" y2="69" stroke="#5C8FA8" stroke-width="1" opacity="0.18"/>
+            <!-- Head -->
+            <circle cx="50" cy="38" r="21" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+            <!-- Ear tufts -->
+            <polygon points="33,23 25,7 40,19" fill="#5C8FA8"/>
+            <polygon points="67,23 75,7 60,19" fill="#5C8FA8"/>
+            <!-- Facial disc ring -->
+            <ellipse cx="50" cy="40" rx="14" ry="13" fill="none" stroke="#3d6e88" stroke-width="1" opacity="0.5"/>
+            <!-- Eye left -->
+            <circle cx="39" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+            <circle cx="39" cy="37" r="4"   fill="#8db4cc"/>
+            <circle cx="41" cy="35" r="1.5" fill="white" opacity="0.65"/>
+            <!-- Eye right -->
+            <circle cx="61" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+            <circle cx="61" cy="37" r="4"   fill="#8db4cc"/>
+            <circle cx="63" cy="35" r="1.5" fill="white" opacity="0.65"/>
+            <!-- Beak -->
+            <polygon points="47,45 50,52 53,45" fill="#5C8FA8"/>
+            <!-- Talons -->
+            <line x1="40" y1="84" x2="36" y2="90" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="40" y1="84" x2="40" y2="91" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="40" y1="84" x2="44" y2="90" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="60" y1="84" x2="56" y2="90" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="60" y1="84" x2="60" y2="91" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="60" y1="84" x2="64" y2="90" stroke="#5C8FA8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="char-name" style="color:var(--owl-light)">Phoenix</div>
+          <div class="char-role">Inward Journey</div>
+        </div>
+
+        <div class="char-card" onclick="nav('query')">
+          <div class="char-glow" style="background:var(--fox)"></div>
+          <!-- QUERY FOX -->
+          <svg width="88" height="88" viewBox="0 0 100 100" fill="none">
+            <!-- Tail -->
+            <path d="M65 76 C80 62 92 72 82 86 C74 95 60 84 65 76Z" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+            <!-- Tail tip -->
+            <ellipse cx="82" cy="84" rx="7" ry="5" fill="#F0E8D5" opacity="0.45" transform="rotate(-25 82 84)"/>
+            <!-- Body -->
+            <ellipse cx="50" cy="72" rx="20" ry="15" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+            <!-- Head -->
+            <ellipse cx="50" cy="40" rx="19" ry="18" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+            <!-- Ear left -->
+            <polygon points="33,28 26,6 43,24" fill="#C47A52"/>
+            <polygon points="34,27 29,10 41,24" fill="#1c0c05" opacity="0.7"/>
+            <!-- Ear right -->
+            <polygon points="67,28 74,6 57,24" fill="#C47A52"/>
+            <polygon points="66,27 71,10 59,24" fill="#1c0c05" opacity="0.7"/>
+            <!-- Muzzle -->
+            <ellipse cx="50" cy="47" rx="11" ry="8" fill="#271408" stroke="#C47A52" stroke-width="1"/>
+            <!-- Nose -->
+            <ellipse cx="50" cy="41" rx="3.5" ry="2.5" fill="#C47A52"/>
+            <!-- Mouth lines -->
+            <path d="M47 44 Q50 47 53 44" stroke="#C47A52" stroke-width="1" fill="none" opacity="0.5"/>
+            <!-- Eye left -->
+            <ellipse cx="39" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+            <ellipse cx="39" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+            <circle  cx="40" cy="34" r="1.1" fill="white" opacity="0.6"/>
+            <!-- Eye right -->
+            <ellipse cx="61" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+            <ellipse cx="61" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+            <circle  cx="62" cy="34" r="1.1" fill="white" opacity="0.6"/>
+            <!-- Cheek marks -->
+            <line x1="28" y1="39" x2="34" y2="41" stroke="#C47A52" stroke-width="1.2" opacity="0.45" stroke-linecap="round"/>
+            <line x1="27" y1="43" x2="34" y2="44" stroke="#C47A52" stroke-width="1.2" opacity="0.3"  stroke-linecap="round"/>
+            <line x1="72" y1="39" x2="66" y2="41" stroke="#C47A52" stroke-width="1.2" opacity="0.45" stroke-linecap="round"/>
+            <line x1="73" y1="43" x2="66" y2="44" stroke="#C47A52" stroke-width="1.2" opacity="0.3"  stroke-linecap="round"/>
+          </svg>
+          <div class="char-name" style="color:var(--fox)">Query</div>
+          <div class="char-role">Outward Journey</div>
+        </div>
+
+      </div>
+
+      <!-- Destination cards -->
+      <div class="dest-section">
+        <div class="section-heading">Destinations</div>
+        <div class="dest-grid">
+
+          <div class="dest-card" onclick="nav('phoenix')">
+            <div class="dest-glow" style="background:var(--owl-light)"></div>
+            <div class="dest-name">Phoenix</div>
+            <div class="dest-desc">Wisdom, breath, knowing yourself</div>
+          </div>
+
+          <div class="dest-card" onclick="nav('query')">
+            <div class="dest-glow" style="background:var(--fox)"></div>
+            <div class="dest-name">Query</div>
+            <div class="dest-desc">Situations, relationships, what to say</div>
+          </div>
+
+          <div class="dest-card" onclick="nav('den')">
+            <div class="dest-glow" style="background:var(--amber)"></div>
+            <div class="dest-name">The Den</div>
+            <div class="dest-desc">Mind and body, whole</div>
+          </div>
+
+          <div class="dest-card" onclick="nav('clearing')">
+            <div class="dest-glow" style="background:var(--green)"></div>
+            <div class="dest-name">The Clearing</div>
+            <div class="dest-desc">Journal, draw, grow</div>
+          </div>
+
+          <div class="dest-card span-2" onclick="nav('burrow')">
+            <div class="dest-glow" style="background:var(--amber)"></div>
+            <div class="dest-name">The Burrow</div>
+            <div class="dest-desc">A warm space to connect with the people who care for you — always open</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /home -->
+
+
+  <!-- ══════════════════════════════════
+       PHOENIX
+  ══════════════════════════════════ -->
+  <div id="screen-phoenix" class="screen">
+    <div class="phoenix-inner">
+
+      <div class="screen-hero">
+        <div class="breathing">
+          <svg width="96" height="96" viewBox="0 0 100 100" fill="none">
+            <path d="M28 64 C14 54 13 74 25 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M72 64 C86 54 87 74 75 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+            <ellipse cx="50" cy="70" rx="21" ry="16" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+            <line x1="42" y1="64" x2="58" y2="64" stroke="#5C8FA8" stroke-width="1" opacity="0.25"/>
+            <line x1="40" y1="69" x2="60" y2="69" stroke="#5C8FA8" stroke-width="1" opacity="0.18"/>
+            <circle cx="50" cy="38" r="21" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+            <polygon points="33,23 25,7 40,19" fill="#5C8FA8"/>
+            <polygon points="67,23 75,7 60,19" fill="#5C8FA8"/>
+            <ellipse cx="50" cy="40" rx="14" ry="13" fill="none" stroke="#3d6e88" stroke-width="1" opacity="0.5"/>
+            <circle cx="39" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+            <circle cx="39" cy="37" r="4"   fill="#8db4cc"/>
+            <circle cx="41" cy="35" r="1.5" fill="white" opacity="0.65"/>
+            <circle cx="61" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+            <circle cx="61" cy="37" r="4"   fill="#8db4cc"/>
+            <circle cx="63" cy="35" r="1.5" fill="white" opacity="0.65"/>
+            <polygon points="47,45 50,52 53,45" fill="#5C8FA8"/>
+          </svg>
+        </div>
+        <div class="screen-eyebrow" style="color:var(--owl)">Inward Journey</div>
+        <h2 class="screen-title">Phoenix</h2>
+        <p class="screen-intro">This is where you go inside. Phoenix is slow, wise, and here when the noise gets loud.</p>
+      </div>
+
+      <div class="cards-col">
+
+        <div class="card">
+          <div class="card-label" style="color:var(--owl)">Breathe</div>
+          <div class="card-title">Find the quiet</div>
+          <div class="card-body">A short breathing exercise to help you land when things feel like too much.</div>
+          <span class="pill-tag">Coming soon</span>
+        </div>
+
+        <div class="card">
+          <div class="card-label" style="color:var(--owl)">Check In</div>
+          <div class="card-title">How are you actually?</div>
+          <div class="card-body">Not the "fine" version — the real one. Phoenix listens without judgment, without an agenda.</div>
+          <span class="pill-tag">Coming soon</span>
+        </div>
+
+        <div class="card">
+          <div class="card-label" style="color:var(--owl)">Something to sit with</div>
+          <div class="card-title">Today's thought</div>
+          <div class="card-body">A small question, a short idea, something worth carrying through your day.</div>
+          <span class="pill-tag">Coming soon</span>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /phoenix -->
+
+
+  <!-- ══════════════════════════════════
+       QUERY
+  ══════════════════════════════════ -->
+  <div id="screen-query" class="screen">
+    <div class="query-inner">
+
+      <div class="screen-hero">
+        <svg width="84" height="84" viewBox="0 0 100 100" fill="none">
+          <path d="M65 76 C80 62 92 72 82 86 C74 95 60 84 65 76Z" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <ellipse cx="82" cy="84" rx="7" ry="5" fill="#F0E8D5" opacity="0.45" transform="rotate(-25 82 84)"/>
+          <ellipse cx="50" cy="72" rx="20" ry="15" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <ellipse cx="50" cy="40" rx="19" ry="18" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <polygon points="33,28 26,6 43,24" fill="#C47A52"/>
+          <polygon points="34,27 29,10 41,24" fill="#1c0c05" opacity="0.7"/>
+          <polygon points="67,28 74,6 57,24" fill="#C47A52"/>
+          <polygon points="66,27 71,10 59,24" fill="#1c0c05" opacity="0.7"/>
+          <ellipse cx="50" cy="47" rx="11" ry="8" fill="#271408" stroke="#C47A52" stroke-width="1"/>
+          <ellipse cx="50" cy="41" rx="3.5" ry="2.5" fill="#C47A52"/>
+          <path d="M47 44 Q50 47 53 44" stroke="#C47A52" stroke-width="1" fill="none" opacity="0.5"/>
+          <ellipse cx="39" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+          <ellipse cx="39" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+          <circle  cx="40" cy="34" r="1.1" fill="white" opacity="0.6"/>
+          <ellipse cx="61" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+          <ellipse cx="61" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+          <circle  cx="62" cy="34" r="1.1" fill="white" opacity="0.6"/>
+          <line x1="28" y1="39" x2="34" y2="41" stroke="#C47A52" stroke-width="1.2" opacity="0.45" stroke-linecap="round"/>
+          <line x1="27" y1="43" x2="34" y2="44" stroke="#C47A52" stroke-width="1.2" opacity="0.3"  stroke-linecap="round"/>
+          <line x1="72" y1="39" x2="66" y2="41" stroke="#C47A52" stroke-width="1.2" opacity="0.45" stroke-linecap="round"/>
+          <line x1="73" y1="43" x2="66" y2="44" stroke="#C47A52" stroke-width="1.2" opacity="0.3"  stroke-linecap="round"/>
+        </svg>
+        <div class="screen-eyebrow" style="color:var(--fox)">Outward Journey</div>
+        <h2 class="screen-title">Query</h2>
+        <p class="screen-intro">Tell me what's going on. I'm clever, warm, and I've got your back.</p>
+      </div>
+
+      <!-- Input area -->
+      <div>
+        <label class="input-label" for="situation-input">What's going on?</label>
+        <textarea id="situation-input" placeholder="Describe the situation — as much or as little as you want..."></textarea>
+      </div>
+
+      <div>
+        <div class="input-label" style="margin-bottom:10px">Who is this about?</div>
+        <div class="rel-row">
+          <button class="rel-pill" data-rel="friend">Friend</button>
+          <button class="rel-pill" data-rel="caregiver">Caregiver</button>
+          <button class="rel-pill" data-rel="teacher">Teacher</button>
+          <button class="rel-pill" data-rel="romantic">Romantic interest</button>
+        </div>
+      </div>
+
+      <button id="ask-btn" onclick="askQuery()">Ask Query →</button>
+
+      <!-- Response area -->
+      <div id="query-response">
+        <div class="response-card">
+          <div class="response-who">
+            <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+              <ellipse cx="50" cy="72" rx="20" ry="15" fill="#1c0c05" stroke="#C47A52" stroke-width="2"/>
+              <ellipse cx="50" cy="40" rx="19" ry="18" fill="#1c0c05" stroke="#C47A52" stroke-width="2"/>
+              <polygon points="33,28 26,6 43,24" fill="#C47A52"/>
+              <polygon points="67,28 74,6 57,24" fill="#C47A52"/>
+              <ellipse cx="39" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+              <ellipse cx="39" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+              <ellipse cx="61" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+              <ellipse cx="61" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+            </svg>
+            <div class="response-speaker">Query says —</div>
+          </div>
+          <div id="response-content"></div>
+        </div>
+        <button class="reset-btn" onclick="resetQuery()">Ask something new</button>
+      </div>
+
+    </div>
+  </div><!-- /query -->
+
+
+  <!-- ══════════════════════════════════
+       THE DEN
+  ══════════════════════════════════ -->
+  <div id="screen-den" class="screen">
+    <div class="den-inner">
+
+      <!-- Duo -->
+      <div class="den-duo">
+        <svg width="72" height="72" viewBox="0 0 100 100" fill="none">
+          <path d="M28 64 C14 54 13 74 25 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M72 64 C86 54 87 74 75 76" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5" stroke-linejoin="round"/>
+          <ellipse cx="50" cy="70" rx="21" ry="16" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+          <circle cx="50" cy="38" r="21" fill="#0d2030" stroke="#5C8FA8" stroke-width="1.5"/>
+          <polygon points="33,23 25,7 40,19" fill="#5C8FA8"/>
+          <polygon points="67,23 75,7 60,19" fill="#5C8FA8"/>
+          <circle cx="39" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+          <circle cx="39" cy="37" r="4"   fill="#8db4cc"/>
+          <circle cx="61" cy="37" r="7.5" fill="#081624" stroke="#8db4cc" stroke-width="1.5"/>
+          <circle cx="61" cy="37" r="4"   fill="#8db4cc"/>
+          <polygon points="47,45 50,52 53,45" fill="#5C8FA8"/>
+        </svg>
+
+        <div class="den-bridge">
+          <div class="den-dot" style="background:var(--owl)"></div>
+          <div class="den-line" style="background:linear-gradient(to bottom, var(--owl), var(--fox)); opacity:0.4"></div>
+          <div class="den-dot" style="background:var(--fox)"></div>
+        </div>
+
+        <svg width="72" height="72" viewBox="0 0 100 100" fill="none">
+          <path d="M65 76 C80 62 92 72 82 86 C74 95 60 84 65 76Z" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <ellipse cx="50" cy="72" rx="20" ry="15" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <ellipse cx="50" cy="40" rx="19" ry="18" fill="#1c0c05" stroke="#C47A52" stroke-width="1.5"/>
+          <polygon points="33,28 26,6 43,24" fill="#C47A52"/>
+          <polygon points="67,28 74,6 57,24" fill="#C47A52"/>
+          <ellipse cx="39" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+          <ellipse cx="39" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+          <ellipse cx="61" cy="35" rx="5.5" ry="5" fill="#09070a" stroke="#E8A040" stroke-width="1.5"/>
+          <ellipse cx="61" cy="35" rx="2.8" ry="2.6" fill="#E8A040"/>
+          <ellipse cx="50" cy="41" rx="3.5" ry="2.5" fill="#C47A52"/>
+        </svg>
+      </div>
+
+      <div class="screen-hero">
+        <div class="screen-eyebrow" style="color:var(--amber)">The Whole of You</div>
+        <h2 class="screen-title">The Den</h2>
+        <p class="screen-intro">Where Phoenix and Query meet — inside and outside, mind and body. All of you in one place.</p>
+      </div>
+
+      <div class="cards-col">
+
+        <div class="card">
+          <div class="card-label" style="color:var(--amber)">Body + Mind</div>
+          <div class="card-title">How you're carrying things</div>
+          <div class="card-body">Sometimes the answer you're looking for lives in your body, not your head. Phoenix and Query, working together.</div>
+          <span class="pill-tag">Coming soon</span>
+        </div>
+
+        <div class="card">
+          <div class="card-label" style="color:var(--amber)">Big Picture</div>
+          <div class="card-title">Who you're becoming</div>
+          <div class="card-body">The slow work. The patterns. The things you're growing into without even noticing.</div>
+          <span class="pill-tag">Coming soon</span>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /den -->
+
+
+  <!-- ══════════════════════════════════
+       THE CLEARING
+  ══════════════════════════════════ -->
+  <div id="screen-clearing" class="screen">
+    <div class="clearing-inner">
+
+      <div class="screen-hero">
+        <div class="screen-eyebrow" style="color:var(--green)">Your Space</div>
+        <h2 class="screen-title">The Clearing</h2>
+        <p class="screen-intro">Just yours. Write, draw, reflect, play. No one else comes here unless you invite them.</p>
+      </div>
+
+      <div class="tab-strip">
+        <button class="tab active">Journal</button>
+        <button class="tab">Draw</button>
+        <button class="tab">Gratitude</button>
+        <button class="tab">Growth</button>
+      </div>
+
+      <div class="soon-box">
+        <span class="soon-glyph">✦ ✦ ✦</span>
+        Your journal lives here.<br>
+        A private space to think out loud —<br>no audience, no pressure.
+        <div style="margin-top:14px;font-size:11px;color:var(--muted-dim)">Coming in the next build</div>
+      </div>
+
+    </div>
+  </div><!-- /clearing -->
+
+
+  <!-- ══════════════════════════════════
+       THE BURROW
+  ══════════════════════════════════ -->
+  <div id="screen-burrow" class="screen">
+    <div class="burrow-inner">
+
+      <div class="screen-hero">
+        <div class="screen-eyebrow" style="color:var(--amber)">The Bridge</div>
+        <h2 class="screen-title">The Burrow</h2>
+        <p class="screen-intro">A warm, safe space between you and the people who love you. Always open — always on your terms.</p>
+      </div>
+
+      <div class="chat-mock">
+        <div class="chat-meta">Brimm Hollow · The Burrow</div>
+        <div class="bubble kid">I don't know how to say this out loud, but I've been feeling really overwhelmed at school lately.</div>
+        <div class="bubble care">Thank you for sharing this with me. I'm really glad you told me. Can we talk tonight after dinner?</div>
+        <div class="bubble kid">Yeah. I'd like that.</div>
+        <div class="chat-caption">This is what The Burrow makes possible.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label" style="color:var(--amber)">How it works</div>
+        <div class="card-title">Always mediated, always yours</div>
+        <div class="card-body">The Burrow gives you a way to reach the people who care for you — even when words are hard. You control what they see.</div>
+        <span class="pill-tag">Caregiver features coming soon</span>
+      </div>
+
+    </div>
+  </div><!-- /burrow -->
+
+</div><!-- /screens -->
+
+
+<!-- ══════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════ -->
+<nav id="bottom-nav">
+
+  <button class="nav-btn" data-screen="phoenix" onclick="nav('phoenix')">
+    <svg class="nav-icon" viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="13" r="8" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="9.5,8 7,2 12,7"  fill="currentColor"/>
+      <polygon points="18.5,8 21,2 16,7" fill="currentColor"/>
+      <circle cx="10.5" cy="13" r="2.2" fill="currentColor"/>
+      <circle cx="17.5" cy="13" r="2.2" fill="currentColor"/>
+      <polygon points="12.5,16 14,19 15.5,16" fill="currentColor"/>
+    </svg>
+    <span class="nav-label">Phoenix</span>
+  </button>
+
+  <button class="nav-btn" data-screen="query" onclick="nav('query')">
+    <svg class="nav-icon" viewBox="0 0 28 28" fill="none">
+      <ellipse cx="14" cy="15" rx="7" ry="6.5" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="8.5,11.5 6,4 12.5,10"  fill="currentColor"/>
+      <polygon points="19.5,11.5 22,4 15.5,10" fill="currentColor"/>
+      <ellipse cx="14" cy="18" rx="3.5" ry="2.5" stroke="currentColor" stroke-width="1"/>
+      <path d="M22 22 C24 18 26 22 24 25 C22.5 27 20 24 22 22Z" fill="currentColor" opacity="0.7"/>
+    </svg>
+    <span class="nav-label">Query</span>
+  </button>
+
+  <button class="nav-btn" data-screen="den" onclick="nav('den')">
+    <svg class="nav-icon" viewBox="0 0 28 28" fill="none">
+      <circle cx="10" cy="14" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="18" cy="14" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    <span class="nav-label">The Den</span>
+  </button>
+
+  <button class="nav-btn" data-screen="clearing" onclick="nav('clearing')">
+    <svg class="nav-icon" viewBox="0 0 28 28" fill="none">
+      <path d="M14 24 C14 24 6 17 8 9.5 C9.5 4 18.5 4 20 9.5 C22 17 14 24 14 24Z"
+            stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+      <line x1="14" y1="24" x2="14" y2="15" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+    </svg>
+    <span class="nav-label">Clearing</span>
+  </button>
+
+  <button class="nav-btn" data-screen="burrow" onclick="nav('burrow')">
+    <svg class="nav-icon" viewBox="0 0 28 28" fill="none">
+      <path d="M4 14 L14 5 L24 14" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 12 L7 23 L21 23 L21 12" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M11 23 L11 17.5 Q14 15 17 17.5 L17 23"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <span class="nav-label">Burrow</span>
+  </button>
+
+</nav>
+
+
+<script>
+  // ─────────────────────────────────────────────────────────
+  // STARS
+  // ─────────────────────────────────────────────────────────
+  const canvas = document.getElementById('stars');
+  const ctx    = canvas.getContext('2d');
+  let   stars  = [];
+
+  function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function makeStars() {
+    stars = [];
+    const n = Math.floor((canvas.width * canvas.height) / 5000);
+    for (let i = 0; i < n; i++) {
+      stars.push({
+        x:     Math.random() * canvas.width,
+        y:     Math.random() * canvas.height,
+        r:     Math.random() * 1.1 + 0.15,
+        base:  Math.random() * 0.45 + 0.08,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.0006 + 0.0002,
+      });
+    }
+  }
+
+  function drawStars(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+      const a = s.base + Math.sin(ts * s.speed + s.phase) * 0.12;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(240,232,213,${Math.max(0, a)})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+
+  resizeCanvas();
+  makeStars();
+  requestAnimationFrame(drawStars);
+  window.addEventListener('resize', () => { resizeCanvas(); makeStars(); });
+
+  // ─────────────────────────────────────────────────────────
+  // NAVIGATION
+  // ─────────────────────────────────────────────────────────
+  let current = 'home';
+
+  function nav(id) {
+    if (id === current) return;
+
+    document.getElementById('screen-' + current)?.classList.remove('active');
+    const next = document.getElementById('screen-' + id);
+    if (next) { next.classList.add('active'); next.scrollTop = 0; }
+
+    current = id;
+
+    // Top bar
+    const bar = document.getElementById('top-bar');
+    bar.classList.toggle('visible', id !== 'home');
+
+    // Stars fade on non-home
+    canvas.style.opacity = id === 'home' ? '1' : '0.35';
+
+    // Nav active state
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.screen === id);
+    });
+  }
+
+  document.getElementById('home-btn').addEventListener('click', () => nav('home'));
+
+  // Clearing tabs (visual only for now)
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // QUERY — ANTHROPIC API
+  // ─────────────────────────────────────────────────────────
+
+  let selectedRel = null;
+
+  document.querySelectorAll('.rel-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.rel-pill').forEach(x => x.classList.remove('on'));
+      p.classList.add('on');
+      selectedRel = p.dataset.rel;
+    });
+  });
+
+  function resetQuery() {
+    document.getElementById('situation-input').value = '';
+    document.querySelectorAll('.rel-pill').forEach(x => x.classList.remove('on'));
+    selectedRel = null;
+    document.getElementById('query-response').classList.remove('show');
+    document.getElementById('response-content').innerHTML = '';
+    document.getElementById('screen-query').scrollTop = 0;
+  }
+
+  async function askQuery() {
+    const situation = document.getElementById('situation-input').value.trim();
+    if (!situation) {
+      document.getElementById('situation-input').focus();
+      return;
+    }
+
+    const btn        = document.getElementById('ask-btn');
+    const responseEl = document.getElementById('query-response');
+    const contentEl  = document.getElementById('response-content');
+
+    btn.disabled    = true;
+    btn.textContent = 'Query is thinking...';
+    responseEl.classList.add('show');
+    contentEl.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+
+    // Scroll to response
+    setTimeout(() => {
+      responseEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
+    const relLabel = {
+      friend:    'a friend',
+      caregiver: 'a caregiver',
+      teacher:   'a teacher',
+      romantic:  'a romantic interest',
+    }[selectedRel] || 'someone';
+
+    const systemPrompt = `You are Query, a clever and warm fox character in an app called Brimm Hollow. You help kids ages 10–13 navigate social situations, relationships, and communication.
+
+Your voice:
+- Warm, clever, a little playful — like a wise older sibling who actually gets it
+- Direct but kind — you don't talk down to kids or over-explain
+- Practical — you give real, actionable thoughts
+- You never shame, lecture, or moralize
+- You take feelings seriously, even when you're being light
+
+Keep your response 2–4 short paragraphs. No bullet lists unless they genuinely help. Speak directly to the kid. Don't start with "Hey!" or hollow affirmations. Just get into it.`;
+
+    const userMsg = `This is about ${relLabel}.\n\n${situation}`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model:      'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system:     systemPrompt,
+          messages:   [{ role: 'user', content: userMsg }],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data.content?.[0]?.text || 'Something went quiet on my end. Try again?';
+
+      const html = text
+        .split(/\n\n+/)
+        .filter(p => p.trim())
+        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+        .join('');
+
+      contentEl.innerHTML = `<div class="response-text">${html}</div>`;
+
+    } catch (e) {
+      console.error(e);
+      contentEl.innerHTML = `<div class="err-msg">Something went sideways. Check the console for details.</div>`;
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Ask Query →';
+    }
+  }
+</script>
+</body>
+</html>
