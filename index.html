@@ -228,9 +228,11 @@
       top: 0; left: 0; right: 0;
       height: calc(var(--header-h) + var(--safe-top));
       padding-top: var(--safe-top);
-      display: flex;
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: center;
       z-index: 200;
       pointer-events: none;
       opacity: 0;
@@ -238,6 +240,23 @@
       background: linear-gradient(to bottom, rgba(14,11,36,0.97) 0%, rgba(14,11,36,0) 100%);
     }
     #top-bar.visible { opacity: 1; pointer-events: all; }
+
+    #back-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+      justify-self: start;
+    }
+    #back-btn:active { color: var(--cream); }
 
     #home-btn {
       background: none;
@@ -248,7 +267,7 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       cursor: pointer;
-      padding: 10px 20px;
+      padding: 10px 4px;
       opacity: 0.88;
       transition: opacity 0.2s;
     }
@@ -425,6 +444,123 @@
     }
     .btn-primary:active { transform: scale(0.97); opacity: 0.85; }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    /* ═══════════════════════════════════════
+       PHOENIX INTERACTIVE COMPONENTS
+    ═══════════════════════════════════════ */
+    .card-action-btn {
+      margin-top: 14px;
+      width: 100%;
+      padding: 12px;
+      background: var(--owl-soft);
+      border: 1px solid rgba(139,159,212,0.35);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--owl-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .card-action-btn:active { opacity: 0.7; transform: scale(0.98); }
+
+    /* Breathe */
+    .breathe-ui { display: none; flex-direction: column; align-items: center; padding: 12px 0 4px; gap: 10px; }
+    .breathe-ui.show { display: flex; }
+
+    .breathe-circle-wrap { padding: 20px 0; display: flex; align-items: center; justify-content: center; }
+
+    .breathe-circle {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,159,212,0.25) 0%, rgba(139,159,212,0.06) 100%);
+      border: 2px solid var(--owl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      color: var(--owl-light);
+      transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+      box-shadow: 0 0 0 rgba(139,159,212,0);
+    }
+    .breathe-circle.expanded {
+      box-shadow: 0 0 32px rgba(139,159,212,0.3);
+    }
+
+    .breathe-phase-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--cream);
+      text-align: center;
+      min-height: 26px;
+    }
+
+    /* Check In */
+    .checkin-input-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+    #checkin-input {
+      width: 100%;
+      min-height: 80px;
+      background: rgba(35,30,72,0.75);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #checkin-input:focus { border-color: var(--owl); }
+    #checkin-input::placeholder { color: var(--muted-dim); }
+
+    .checkin-response { display: none; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .checkin-response.show { display: flex; }
+
+    .phoenix-says {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .phoenix-says-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: var(--owl-light);
+      font-weight: 600;
+    }
+
+    .checkin-response-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--cream);
+      font-style: italic;
+    }
+
+    .checkin-reset-btn {
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      color: var(--muted-dim);
+      cursor: pointer;
+      align-self: center;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+    .checkin-reset-btn:hover { color: var(--muted); }
+
+    /* Daily prompt */
+    .daily-prompt-text {
+      font-size: 15px;
+      color: var(--cream);
+      line-height: 1.6;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      margin-top: 8px;
+    }
 
     /* ═══════════════════════════════════════
        HOME SCREEN
@@ -1191,7 +1327,14 @@
 
 <!-- Top bar -->
 <div id="top-bar">
+  <button id="back-btn" onclick="nav('home')">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M10 3 L5 8 L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Home
+  </button>
   <button id="home-btn">Brimm Hollow</button>
+  <div></div>
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -1381,25 +1524,54 @@
 
       <div class="cards-col">
 
+        <!-- BREATHE CARD -->
         <div class="card">
           <div class="card-label" style="color:var(--owl)">Breathe</div>
           <div class="card-title">Find the quiet</div>
           <div class="card-body">A short breathing exercise to help you land when things feel like too much.</div>
-          <span class="pill-tag">Coming soon</span>
+          <div class="breathe-ui" id="breathe-ui">
+            <div class="breathe-circle-wrap">
+              <div class="breathe-circle" id="breathe-circle">
+                <span id="breathe-count">4</span>
+              </div>
+            </div>
+            <div class="breathe-phase-text" id="breathe-phase-text">Breathe in</div>
+          </div>
+          <button class="card-action-btn" id="breathe-btn" onclick="toggleBreathe()">Start breathing</button>
         </div>
 
+        <!-- CHECK IN CARD -->
         <div class="card">
           <div class="card-label" style="color:var(--owl)">Check In</div>
           <div class="card-title">How are you, actually?</div>
-          <div class="card-body">Not the fine version. The real one. Phoenix listens without judgment and without an agenda.</div>
-          <span class="pill-tag">Coming soon</span>
+          <div class="card-body">Not the fine version. The real one. Phoenix listens.</div>
+          <div class="checkin-input-wrap" id="checkin-input-wrap">
+            <textarea id="checkin-input" placeholder="How are you feeling right now..."></textarea>
+            <button class="card-action-btn" style="margin-top:0" id="checkin-btn" onclick="askPhoenix()">Tell Phoenix</button>
+          </div>
+          <div class="checkin-response" id="checkin-response">
+            <div class="phoenix-says">
+              <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="37" r="24" fill="url(#grad-owl-body)" stroke="#6B80C8" stroke-width="2"/>
+                <path d="M31 22 C26 14 22 6 26 3 C29 2 33 8 35 15 C37 10 39 5 42 4 C44 5 43 11 39 19Z" fill="#8B9FD4"/>
+                <path d="M69 22 C74 14 78 6 74 3 C71 2 67 8 65 15 C63 10 61 5 58 4 C56 5 57 11 61 19Z" fill="#8B9FD4"/>
+                <circle cx="37" cy="36" r="9"   fill="#09071e" stroke="#8B9FD4" stroke-width="1.5"/>
+                <circle cx="37" cy="36" r="5.5" fill="url(#grad-owl-eye)"/>
+                <circle cx="63" cy="36" r="9"   fill="#09071e" stroke="#8B9FD4" stroke-width="1.5"/>
+                <circle cx="63" cy="36" r="5.5" fill="url(#grad-owl-eye)"/>
+              </svg>
+              <div class="phoenix-says-label">Phoenix</div>
+            </div>
+            <div class="checkin-response-text" id="checkin-response-text"></div>
+            <button class="checkin-reset-btn" onclick="resetCheckin()">Start fresh</button>
+          </div>
         </div>
 
+        <!-- SOMETHING TO SIT WITH -->
         <div class="card">
           <div class="card-label" style="color:var(--owl)">Something to sit with</div>
           <div class="card-title">Today's thought</div>
-          <div class="card-body">A small question, a short idea, something worth carrying through your day.</div>
-          <span class="pill-tag">Coming soon</span>
+          <div class="daily-prompt-text" id="daily-prompt"></div>
         </div>
 
       </div>
@@ -1864,6 +2036,13 @@
 
   document.getElementById('home-btn').addEventListener('click', () => nav('home'));
 
+  // Prevent browser back button from leaving the app
+  history.pushState(null, '', location.href);
+  window.addEventListener('popstate', function() {
+    history.pushState(null, '', location.href);
+    if (current !== 'home') nav('home');
+  });
+
   // Clearing tabs
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -2090,6 +2269,168 @@ REFRAME: [The message rewritten to express the same feeling and need without bla
 
   // Render mock thread on load
   renderThread();
+
+  /* ════════════════════════════════════════
+     PHOENIX: BREATHE
+  ════════════════════════════════════════ */
+  const BREATHE_PHASES = [
+    { text: 'Breathe in',  duration: 4000, expanded: true  },
+    { text: 'Hold',        duration: 4000, expanded: true  },
+    { text: 'Breathe out', duration: 4000, expanded: false },
+    { text: 'Hold',        duration: 4000, expanded: false },
+  ];
+
+  let breatheRunning  = false;
+  let breathePhaseIdx = 0;
+  let breatheCounter  = 0;
+  let breatheTimer    = null;
+
+  function toggleBreathe() {
+    if (breatheRunning) {
+      stopBreathe();
+    } else {
+      startBreathe();
+    }
+  }
+
+  function startBreathe() {
+    breatheRunning  = true;
+    breathePhaseIdx = 0;
+    document.getElementById('breathe-ui').classList.add('show');
+    document.getElementById('breathe-btn').textContent = 'Stop';
+    runBreathePhase();
+  }
+
+  function stopBreathe() {
+    breatheRunning = false;
+    clearTimeout(breatheTimer);
+    document.getElementById('breathe-ui').classList.remove('show');
+    document.getElementById('breathe-btn').textContent = 'Start breathing';
+    const circle = document.getElementById('breathe-circle');
+    circle.style.transform = '';
+    circle.classList.remove('expanded');
+  }
+
+  function runBreathePhase() {
+    if (!breatheRunning) return;
+    const phase  = BREATHE_PHASES[breathePhaseIdx];
+    const circle = document.getElementById('breathe-circle');
+
+    document.getElementById('breathe-phase-text').textContent = phase.text;
+    breatheCounter = phase.duration / 1000;
+    document.getElementById('breathe-count').textContent = breatheCounter;
+
+    if (phase.expanded) {
+      circle.style.transform = 'scale(1.45)';
+      circle.classList.add('expanded');
+    } else {
+      circle.style.transform = 'scale(1)';
+      circle.classList.remove('expanded');
+    }
+
+    const tick = setInterval(() => {
+      if (!breatheRunning) { clearInterval(tick); return; }
+      breatheCounter--;
+      document.getElementById('breathe-count').textContent = breatheCounter;
+      if (breatheCounter <= 0) {
+        clearInterval(tick);
+        breathePhaseIdx = (breathePhaseIdx + 1) % BREATHE_PHASES.length;
+        breatheTimer = setTimeout(runBreathePhase, 100);
+      }
+    }, 1000);
+  }
+
+  /* ════════════════════════════════════════
+     PHOENIX: CHECK IN
+  ════════════════════════════════════════ */
+  async function askPhoenix() {
+    const text = document.getElementById('checkin-input').value.trim();
+    if (!text) { document.getElementById('checkin-input').focus(); return; }
+
+    const btn       = document.getElementById('checkin-btn');
+    const respEl    = document.getElementById('checkin-response');
+    const contentEl = document.getElementById('checkin-response-text');
+
+    btn.disabled    = true;
+    btn.textContent = 'Phoenix is listening...';
+    respEl.classList.add('show');
+    contentEl.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+    document.getElementById('checkin-input-wrap').style.opacity = '0.4';
+
+    const system = `You are Phoenix, a wise and warm owl in an app called Brimm Hollow for kids ages 10 to 13.
+
+When a kid checks in with you, you:
+- Respond with quiet warmth, like a steady presence sitting beside them
+- Reflect back what you hear without judgment
+- Never give advice or tell them what to do
+- May ask one gentle, open question to help them go a little deeper
+- Keep your response to 2 to 3 sentences
+- Speak simply and directly, not clinically
+
+You do not fix. You witness. You are the owl who sees clearly in the dark.`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          system,
+          messages: [{ role: 'user', content: text }]
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      contentEl.textContent = data.content?.[0]?.text || 'I hear you.';
+    } catch (e) {
+      console.error(e);
+      contentEl.textContent = 'Something went quiet on my end. Try again.';
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Tell Phoenix';
+    }
+  }
+
+  function resetCheckin() {
+    document.getElementById('checkin-input').value = '';
+    document.getElementById('checkin-response').classList.remove('show');
+    document.getElementById('checkin-response-text').innerHTML = '';
+    document.getElementById('checkin-input-wrap').style.opacity = '1';
+  }
+
+  /* ════════════════════════════════════════
+     PHOENIX: DAILY PROMPT
+  ════════════════════════════════════════ */
+  const DAILY_PROMPTS = [
+    "What is one thing you noticed today that you almost missed?",
+    "What is something you are looking forward to, even if it is small?",
+    "What is something that felt hard this week, and something that felt easy?",
+    "Is there something you wish someone would ask you about right now?",
+    "What does your body feel like right now? Where are you carrying tension?",
+    "What is something you did recently that you are quietly proud of?",
+    "Who made you feel seen lately, even in a small way?",
+    "What is one thing you would tell your past self from a year ago?",
+    "Is there something you have been avoiding thinking about?",
+    "What does rest feel like for you? When did you last really rest?",
+    "What is something you used to believe that you no longer believe?",
+    "What has surprised you recently?",
+    "What is something you want more of in your life right now?",
+    "What is the last thing that made you laugh?",
+    "Is there someone you have been thinking about that you have not reached out to?",
+    "What is one thing you are grateful for that you do not say out loud?",
+    "What is something that is taking up space in your mind today?",
+    "What does it feel like to be you right now, in one word?",
+    "What is one small thing that would make tomorrow a little better?",
+    "What is something you are still figuring out?",
+  ];
+
+  (function setDailyPrompt() {
+    const start = new Date(new Date().getFullYear(), 0, 0);
+    const day   = Math.floor((new Date() - start) / 86400000);
+    document.getElementById('daily-prompt').textContent =
+      DAILY_PROMPTS[day % DAILY_PROMPTS.length];
+  })();
 
 </script>
 </body>
