@@ -1774,7 +1774,7 @@
   function tryPassword() {
     const val = document.getElementById('pw-input').value.trim().toLowerCase();
     const msg = document.getElementById('pw-msg');
-    if (val === 'hollow') {
+    if (val === 'connect') {
       sessionStorage.setItem('bh_auth', 'true');
       dismissLanding(true);
     } else {
